@@ -38,7 +38,8 @@ function boilerplate_load() {
 		if(ISS_noExitBeforeComplete) {
 			iss = new NoExitBeforeComplete(iss);
 		}
-		nav = new Nav(NAV_pages, 'content', lms, iss, NAV_flashParams);
+		nav = new Nav(NAV_pages, 'content', lms, iss,
+			window.NAV_flashParams === undefined ? null : NAV_flashParams);
 		if(NAV_show) {
 			nav = new AddHTMLInterface(nav, boilerplate_handleException, "nav",
 			      NAV_prevEnabledImg, NAV_prevDisabledImg, NAV_nextEnabledImg, NAV_nextDisabledImg,

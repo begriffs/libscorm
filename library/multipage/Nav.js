@@ -11,7 +11,7 @@ function Nav(pageUrls, contentDivId, lms, iss, asyncErrHandler, flashParams) {
 	this._pages           = pageUrls;
 	this._visited         = new Array();
 	this._asyncErrHandler = asyncErrHandler;
-	this._flashParams     = null;
+	this._flashParams     = flashParams;
 
 	// If already been in the SCO, then go back to page where user left off
 	this.GotoPage(this.LoadLocation());
