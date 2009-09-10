@@ -21,9 +21,9 @@ function TrackProgress(nav) {
 	}
 }
 
-function AddHTMLInterface(nav,            asyncErrorHandler, navDivId,
-                          prevEnabledImg, prevDisabledImg,   nextEnabledImg, nextDisabledImg,
-                          pastTickImg,    presentTickImg,    futureTickImg) {
+function AddHTMLInterface(nav,             navDivId,       prevEnabledImg,
+                          prevDisabledImg, nextEnabledImg, nextDisabledImg,
+                          pastTickImg,     presentTickImg, futureTickImg) {
 	var self = this; // used in upcoming scopes
 	var x;
 	var navDiv = document.getElementById(navDivId);
@@ -32,12 +32,12 @@ function AddHTMLInterface(nav,            asyncErrorHandler, navDivId,
 		x.id        = "prev";
 		navDiv.appendChild(x);
 	}
-	if(nav.NumPages() > 1) {
+	if(nav.NumPages() > 1) { // A single page needs no navigation
 		for(var i = 0; i < nav.NumPages(); i++) {
 			x           = new Image();
 			x.id        = "p"+i;
 			x.onclick   = (function(i) { return function() { 
-				try { self.GotoPage(i) } catch(e) { asyncErrorHandler(e) }
+				try { self.GotoPage(i) } catch(e) { nav._asyncErrHandler(e) }
 			} })(i);
 			x.className = "tick";
 			navDiv.appendChild(x);
@@ -52,23 +52,22 @@ function AddHTMLInterface(nav,            asyncErrorHandler, navDivId,
 	///////////////////////////////////////////////////////////////////////
 
 	this.UpdateInterface = function() {
+		if(nav.NumPages() < 2) {
+			return; // A single page needs no navigation
+		}
 		// Update "tick" marks
-		var t;
 		for(var i = 0; i < nav.NumPages(); i++) {
-			t = document.getElementById("p"+i);
-			t.src = (nav._visited[i] ? pastTickImg : futureTickImg);
+			document.getElementById("p"+i).src =
+				(nav._visited[i] ? pastTickImg : futureTickImg);
 		}
-		if(nav.NumPages() > 0) {
-			t = document.getElementById("p"+nav.CurrentPageNum());
-			t.src = presentTickImg;
-		}
+		document.getElementById("p"+nav.CurrentPageNum()).src = presentTickImg;
 		// Set the back/forward arrows' responsiveness
 		var p = document.getElementById("prev");
 		var n = document.getElementById("next");
 		if(p) {
 			if(nav.CurrentPageNum() > 0 || nav._iss.CanExitBackward()) {
 				p.onclick   = function() {
-					try { self.PrevPage(); } catch(e) { asyncErrorHandler(e); }
+					try { self.PrevPage(); } catch(e) { nav._asyncErrHandler(e); }
 				};
 				p.src       = prevEnabledImg;
 				p.className = "enabled";
@@ -81,7 +80,7 @@ function AddHTMLInterface(nav,            asyncErrorHandler, navDivId,
 		if(n) {
 			if(nav.CurrentPageNum() < nav.NumPages() - 1 || nav._iss.CanExitForward()) {
 				n.onclick   = function() {
-					try { self.NextPage(); } catch(e) { asyncErrorHandler(e); }
+					try { self.NextPage(); } catch(e) { nav._asyncErrHandler(e); }
 				};
 				n.src       = nextEnabledImg;
 				n.className = "enabled";

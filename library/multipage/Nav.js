@@ -101,7 +101,7 @@ Nav.prototype._loadSWF = function(url) {
 	var content = document.getElementById(this._contentDiv);
 	content.innerHTML = "<div id='swfage' />";
 	swfobject.embedSWF(url, "swfage", "100%", "100%", "9.0.0",
-	                   "expressInstall.swf", null, this._flashParams);
+	                   "expressInstall.swf", {}, this._flashParams);
 }
 
 Nav.prototype._loadHTML = function(url) {

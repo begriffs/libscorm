@@ -38,12 +38,12 @@ function boilerplate_load() {
 		if(ISS_noExitBeforeComplete) {
 			iss = new NoExitBeforeComplete(iss);
 		}
-		nav = new Nav(NAV_pages, 'content', lms, iss,
-			window.NAV_flashParams === undefined ? null : NAV_flashParams);
+		nav = new Nav(NAV_pages, 'content', lms, iss, boilerplate_handleException,
+			window.NAV_flashParams === undefined ? {} : NAV_flashParams);
 		if(NAV_show) {
-			nav = new AddHTMLInterface(nav, boilerplate_handleException, "nav",
-			      NAV_prevEnabledImg, NAV_prevDisabledImg, NAV_nextEnabledImg, NAV_nextDisabledImg,
-			      NAV_pastTickImg, NAV_presentTickImg, NAV_futureTickImg);
+			nav = new AddHTMLInterface(nav, "nav", NAV_prevEnabledImg,
+				NAV_prevDisabledImg, NAV_nextEnabledImg, NAV_nextDisabledImg,
+				NAV_pastTickImg, NAV_presentTickImg, NAV_futureTickImg);
 		}
 		if(NAV_trackProgress) {
 			nav = new TrackProgress(nav);
