@@ -36,20 +36,20 @@ function boilerplate_load() {
 	try {
 		iss = new InterScoSeq(lms, boilerplate_beforeTerminate);
 		if(ISS_noExitBeforeComplete) {
-			iss = new NoExitBeforeComplete(iss);
+			iss = NoExitBeforeComplete(iss);
 		}
 		nav = new Nav(NAV_pages, 'content', lms, iss, boilerplate_handleException,
 			window.NAV_flashParams === undefined ? {} : NAV_flashParams);
 		if(NAV_show) {
-			nav = new AddHTMLInterface(nav, "nav", NAV_prevEnabledImg,
+			nav = AddHTMLInterface(nav, "nav", NAV_prevEnabledImg,
 				NAV_prevDisabledImg, NAV_nextEnabledImg, NAV_nextDisabledImg,
 				NAV_pastTickImg, NAV_presentTickImg, NAV_futureTickImg);
 		}
 		if(NAV_trackProgress) {
-			nav = new TrackProgress(nav);
+			nav = TrackProgress(nav);
 		}
 		if(NAV_trackCompletion) {
-			nav = new TrackCompletion(nav);
+			nav = TrackCompletion(nav);
 		}
 	} catch(e) {
 		boilerplate_handleException(e);

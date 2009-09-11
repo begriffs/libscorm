@@ -1,15 +1,24 @@
+// Parasitic inheritence ala Douglas Crockford
+function modify(p) {
+	function F(){}
+	F.prototype = p;
+	return new F();
+}
+
 function NoExitBeforeComplete(iss) {
-	this.CanExitForward = function() {
+	var o = modify(iss);
+	o.CanExitForward = function() {
 		return iss._lms
 		       && (iss._lms.GetValue("cmi.completion_status")
 		           == "completed")
 		       && iss.CanExitForward();
 	}
-	this.CanExitBackward = function() {
+	o.CanExitBackward = function() {
 		return iss._lms
 		       && (iss._lms.GetValue("cmi.completion_status")
 		           == "completed")
 		       && iss.CanExitBackward();
 	}
+	return o;
 }
 

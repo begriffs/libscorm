@@ -1,5 +1,6 @@
 function TrackCompletion(nav) {
-	this.GotoPage = function(number) {
+	var o = modify(nav);
+	o.GotoPage = function(number) {
 		var ret = nav.GotoPage(number);
 		if(ret && nav._lms) {
 			nav._lms.SetValue("cmi.completion_status",
@@ -8,10 +9,12 @@ function TrackCompletion(nav) {
 		}
 		return ret;
 	}
+	return o;
 }
 
 function TrackProgress(nav) {
-	this.GotoPage = function(number) {
+	var o = modify(nav);
+	o.GotoPage = function(number) {
 		var ret = nav.GotoPage(number);
 		if(ret && nav._lms) {
 			nav._lms.SetValue("cmi.progress_measure", nav.GetVisitedRatio());
@@ -19,39 +22,40 @@ function TrackProgress(nav) {
 		}
 		return ret;
 	}
+	return o;
 }
 
 function AddHTMLInterface(nav,             navDivId,       prevEnabledImg,
                           prevDisabledImg, nextEnabledImg, nextDisabledImg,
                           pastTickImg,     presentTickImg, futureTickImg) {
-	var self = this; // used in upcoming scopes
+	var o = modify(nav);
 	var x;
 	var navDiv = document.getElementById(navDivId);
 	if(nav.NumPages() > 1 || nav._iss.CanExitBackward()) {
-		x           = new Image();
-		x.id        = "prev";
+		x    = new Image();
+		x.id = "prev";
 		navDiv.appendChild(x);
 	}
 	if(nav.NumPages() > 1) { // A single page needs no navigation
 		for(var i = 0; i < nav.NumPages(); i++) {
-			x           = new Image();
-			x.id        = "p"+i;
-			x.onclick   = (function(i) { return function() { 
-				try { self.GotoPage(i) } catch(e) { nav._asyncErrHandler(e) }
+			x         = new Image();
+			x.id      = "p"+i;
+			x.onclick = (function(i) { return function() { 
+				try { o.GotoPage(i) } catch(e) { nav._asyncErrHandler(e) }
 			} })(i);
 			x.className = "tick";
 			navDiv.appendChild(x);
 		}
 	}
 	if(nav.NumPages() > 1 || nav._iss.CanExitForward()) {
-		x           = new Image();
-		x.id        = "next";
+		x    = new Image();
+		x.id = "next";
 		navDiv.appendChild(x);
 	}
 
 	///////////////////////////////////////////////////////////////////////
 
-	this.UpdateInterface = function() {
+	o.UpdateInterface = function() {
 		if(nav.NumPages() < 2) {
 			return; // A single page needs no navigation
 		}
@@ -67,7 +71,7 @@ function AddHTMLInterface(nav,             navDivId,       prevEnabledImg,
 		if(p) {
 			if(nav.CurrentPageNum() > 0 || nav._iss.CanExitBackward()) {
 				p.onclick   = function() {
-					try { self.PrevPage(); } catch(e) { nav._asyncErrHandler(e); }
+					try { o.PrevPage(); } catch(e) { nav._asyncErrHandler(e); }
 				};
 				p.src       = prevEnabledImg;
 				p.className = "enabled";
@@ -80,7 +84,7 @@ function AddHTMLInterface(nav,             navDivId,       prevEnabledImg,
 		if(n) {
 			if(nav.CurrentPageNum() < nav.NumPages() - 1 || nav._iss.CanExitForward()) {
 				n.onclick   = function() {
-					try { self.NextPage(); } catch(e) { nav._asyncErrHandler(e); }
+					try { o.NextPage(); } catch(e) { nav._asyncErrHandler(e); }
 				};
 				n.src       = nextEnabledImg;
 				n.className = "enabled";
@@ -92,7 +96,7 @@ function AddHTMLInterface(nav,             navDivId,       prevEnabledImg,
 		}
 	}
 
-	this.GotoPage = function(number) {
+	o.GotoPage = function(number) {
 		if(nav.GotoPage(number)) {
 			this.UpdateInterface();
 			return true;
@@ -100,7 +104,7 @@ function AddHTMLInterface(nav,             navDivId,       prevEnabledImg,
 		return false;
 	}
 
-	this.PrevPage = function() {
+	o.PrevPage = function() {
 		if(nav.PrevPage()) {
 			this.UpdateInterface();
 			return true;
@@ -108,7 +112,7 @@ function AddHTMLInterface(nav,             navDivId,       prevEnabledImg,
 		return false;
 	}
 
-	this.NextPage = function() {
+	o.NextPage = function() {
 		if(nav.NextPage()) {
 			this.UpdateInterface();
 			return true;
@@ -117,5 +121,6 @@ function AddHTMLInterface(nav,             navDivId,       prevEnabledImg,
 	}
 	///////////////////////////////////////////////////////////////////////
 
-	this.UpdateInterface();
+	o.UpdateInterface();
+	return o;
 }
