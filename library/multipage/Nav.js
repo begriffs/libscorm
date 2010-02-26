@@ -21,6 +21,7 @@ Nav.prototype.GotoPage = function(number) {
 	if(number < 0 || number >= this.NumPages()) {
 		return false;
 	}
+	this.OnBeforeMove();
 	this._visited[number] = true;
 	this._atPage = number;
 	var url = this._pages[this.CurrentPageNum()];
@@ -93,6 +94,9 @@ Nav.prototype.GetVisitedRatio = function() {
 	return this.NumPages() ? (v / this.NumPages()) : 1;
 }
 
+Nav.prototype.OnPageLoad = function(which) {};
+Nav.prototype.OnBeforeMove = function() {};
+
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////// PRIVATE STUFF ///////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -109,15 +113,25 @@ Nav.prototype._loadHTML = function(url) {
 	var handler = this._asyncErrHandler;
 	var divId = this._contentDiv;
 	req.open("GET", url, true);
+	var self = this;
 	req.onreadystatechange = function() {
 		if (this.readyState == XMLHttpRequest.DONE) {
 			if(this.status == 200 || this.status == 0) {
 				var div = document.getElementById(divId);
 				div.innerHTML = this.responseText;
 				var scripts = div.getElementsByTagName('script');
+				var head = document.getElementsByTagName('HEAD').item(0);
 				for(var i = 0; i < scripts.length; i++) {
-					eval(scripts[i].innerHTML); // run script in ajax'd page
+					var s = document.createElement("script");
+					s.type = "text/javascript";
+					if(scripts[i].src) {
+						s.src = scripts[i].src;
+					} else {
+						s.text = scripts[i].innerHTML;
+					}
+					head.appendChild(s);
 				}
+				self.OnPageLoad(self.CurrentPageNum());
 			} else {
 				handler(new LibScormException(
 					this.status,
