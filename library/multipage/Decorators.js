@@ -9,6 +9,9 @@ function TrackCompletion(nav) {
 		}
 		return ret;
 	}
+	// And we note the existing completion of Nav
+	nav._lms.SetValue("cmi.completion_status",
+	                  (nav.GetVisitedRatio() == 1) ? "completed" : "incomplete");
 	return o;
 }
 
@@ -22,6 +25,8 @@ function TrackProgress(nav) {
 		}
 		return ret;
 	}
+	// And we note existing progress of Nav 
+	nav._lms.SetValue("cmi.progress_measure", nav.GetVisitedRatio());
 	return o;
 }
 

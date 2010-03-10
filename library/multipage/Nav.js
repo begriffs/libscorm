@@ -120,7 +120,7 @@ Nav.prototype._loadHTML = function(url) {
 				var div = document.getElementById(divId);
 				div.innerHTML = this.responseText;
 				var scripts = div.getElementsByTagName('script');
-				var head = document.getElementsByTagName('HEAD').item(0);
+				//var head = document.getElementsByTagName('HEAD').item(0);
 				for(var i = 0; i < scripts.length; i++) {
 					var s = document.createElement("script");
 					s.type = "text/javascript";
@@ -129,7 +129,7 @@ Nav.prototype._loadHTML = function(url) {
 					} else {
 						s.text = scripts[i].innerHTML;
 					}
-					head.appendChild(s);
+					document.body.appendChild(s);
 				}
 				self.OnPageLoad(self.CurrentPageNum());
 			} else {
