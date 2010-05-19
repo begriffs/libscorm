@@ -31,27 +31,27 @@ Nav.prototype.GotoPage = function(number) {
 		this._loadHTML(url);
 	}
 	return true;
-}
+};
 
 Nav.prototype.NextPage = function() {
 	return (this.CurrentPageNum() == this.NumPages() - 1)
 		? this._iss.ExitForward()
 		: this.GotoPage(this._atPage + 1);
-}
+};
 
 Nav.prototype.PrevPage = function() {
 	return (this.CurrentPageNum() == 0)
 		? this._iss.ExitBackward()
 		: this.GotoPage(this._atPage - 1);
-}
+};
 
 Nav.prototype.CurrentPageNum = function() {
 	return this._atPage;
-}
+};
 
 Nav.prototype.NumPages = function() {
 	return this._pages.length;
-}
+};
 
 Nav.prototype.SaveLocation = function() {
 	if(this._lms) {
@@ -61,22 +61,23 @@ Nav.prototype.SaveLocation = function() {
 		}
 		this._lms.SetValue("cmi.location", s);
 	}
-}
+};
 
 Nav.prototype.LoadLocation = function() {
 	var loc = 0;
+	var i;
 	try {
 		if(!this._lms) {
 			return 0;
 		}
 		var s = this._lms.GetValue("cmi.location").split(',');
 		loc = Number(s[0]);
-		for(var i = 0; i < s[1].length; i++) {
+		for(i = 0; i < s[1].length; i++) {
 			this._visited[i] = (s[1].charAt(i) == 't');
 		}
 	} catch(e) {
 		if(e.code == 403) { // cmi.location uninitialized: first time in the SCO
-			for(var i = 0; i < this.NumPages(); i++) {
+			for(i = 0; i < this.NumPages(); i++) {
 				this._visited[i] = false;
 			}
 		} else { // a real problem
@@ -84,7 +85,7 @@ Nav.prototype.LoadLocation = function() {
 		}		
 	}
 	return loc;
-}
+};
 
 Nav.prototype.GetVisitedRatio = function() {
 	var v=0;
@@ -92,7 +93,7 @@ Nav.prototype.GetVisitedRatio = function() {
 		v += (this._visted[i] ? 1 : 0);
 	}
 	return this.NumPages() ? (v / this.NumPages()) : 1;
-}
+};
 
 Nav.prototype.OnPageLoad = function(which) {};
 Nav.prototype.OnBeforeMove = function() {};
@@ -106,10 +107,10 @@ Nav.prototype._loadSWF = function(url) {
 	content.innerHTML = "<div id='swfage' />";
 	swfobject.embedSWF(url, "swfage", "100%", "100%", "9.0.0",
 	                   "expressInstall.swf", {}, this._flashParams);
-}
+};
 
 Nav.prototype._loadHTML = function(url) {
-	var req = new XMLHttpRequest;
+	var req = new XMLHttpRequest();
 	var handler = this._asyncErrHandler;
 	var divId = this._contentDiv;
 	req.open("GET", url, true);
@@ -120,7 +121,7 @@ Nav.prototype._loadHTML = function(url) {
 				var div = document.getElementById(divId);
 				div.innerHTML = this.responseText;
 				var scripts = div.getElementsByTagName('script');
-				//var head = document.getElementsByTagName('HEAD').item(0);
+				var head = document.getElementsByTagName('HEAD').item(0);
 				for(var i = 0; i < scripts.length; i++) {
 					var s = document.createElement("script");
 					s.type = "text/javascript";
@@ -129,7 +130,7 @@ Nav.prototype._loadHTML = function(url) {
 					} else {
 						s.text = scripts[i].innerHTML;
 					}
-					document.body.appendChild(s);
+					head.appendChild(s);
 				}
 				self.OnPageLoad(self.CurrentPageNum());
 			} else {
@@ -140,9 +141,9 @@ Nav.prototype._loadHTML = function(url) {
 					"See HTTP spec to interpret error code"));
 			}
 		}
-	}
+	};
 	req.send(null); 
-}
+};
 
 Nav.prototype._lms;
 Nav.prototype._iss;
