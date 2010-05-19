@@ -90,7 +90,7 @@ Nav.prototype.LoadLocation = function() {
 Nav.prototype.GetVisitedRatio = function() {
 	var v=0;
 	for(var i = 0; i < this.NumPages(); i++) {
-		v += (this._visted[i] ? 1 : 0);
+		v += (this._visited[i] ? 1 : 0);
 	}
 	return this.NumPages() ? (v / this.NumPages()) : 1;
 };
