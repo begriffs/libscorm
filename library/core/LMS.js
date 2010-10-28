@@ -42,7 +42,7 @@ function LMS(win) {
 	};
 
 	this.RecordSessionTime = function() {
-		this.SetValue("cmi.session_time", this._secondsToDuration(this._time));
+		this.SetValue("cmi.session_time", this._centisecsToDuration(this._time));
 	};
 
 	//////////////////////////////////////////////////////////////////////////////
@@ -135,45 +135,41 @@ function LMS(win) {
 		return api;
 	};
 
-	this._secondsToDuration = function(time) {
-		var result;
-		if(time === 0) {
-			result = "PT0H0M0S";
-		} else {
-			result = "P";
-			var tmp = time;
-			var years = Math.floor(tmp / 31536000);
-			tmp -= years * 31536000;
-			var months = Math.floor(tmp / 2592000);
-			tmp -= months * 2592000;
-			var days = Math.floor(tmp / 86400);
-			tmp -= days * 86400;
-			var hours = Math.floor(tmp / 3600);
-			tmp -= hours * 3600;
-			var minutes = Math.floor(tmp / 60);
-			tmp -= minutes * 60;
-			var seconds = Math.floor(tmp);
-			tmp -= seconds;
-			//Now we are dealing with some fraction of seconds
-			//We need to round it to 100ths
-			var centisecs = Math.round(tmp * 100);
-
-			if(years > 0) {
-				result += years + "Y";
-			}
-			if(months > 0) {
-				result += months + "M";
-			}
-			if(days > 0) {
-				result += days + "D";
-			}
-			result += "T";
-			result += hours + "H";
-			result += minutes + "M";
-			result += seconds + (centisecs > 0? "." + centisecs: "") + "S";
+	this._centisecsToDuration = function(n) {
+		// Courtesy of the late Claude Ostyn
+		var str = "P";
+		var nCs=n;
+		var nY=0, nM=0, nD=0, nH=0, nMin=0, nS=0;
+		n = Math.max(n,0); // there is no such thing as a negative duration
+		var nCs = n;
+		// Next set of operations uses whole seconds
+		with (Math) {
+			nCs = round(nCs);
+			nY = floor(nCs / 3155760000);
+			nCs -= nY * 3155760000;
+			nM = floor(nCs / 262980000);
+			nCs -= nM * 262980000;
+			nD = floor(nCs / 8640000);
+			nCs -= nD * 8640000;
+			nH = floor(nCs / 360000);
+			nCs -= nH * 360000;
+			var nMin = floor(nCs / 6000);
+			nCs -= nMin * 6000
 		}
-		return result;
-	};
+		// Now we can construct string
+		if (nY > 0) str += nY + "Y";
+		if (nM > 0) str += nM + "M";
+		if (nD > 0) str += nD + "D";
+		if ((nH > 0) || (nMin > 0) || (nCs > 0)) {
+			str += "T";
+			if (nH > 0) str += nH + "H";
+			if (nMin > 0) str += nMin + "M";
+			if (nCs > 0) str += (nCs / 100) + "S";
+		}
+		if (str == "P") str = "PT0H0M0S";
+		// technically PT0S should do but SCORM test suite assumes longer form.
+		return str;
+	}
 
 	///// INITIALIZE /////////////////////////////////////////////////////////////
 
@@ -187,5 +183,5 @@ function LMS(win) {
 	this._wrap("Initialize", true, "");
 
 	var self = this;
-	setInterval(function(){ if(!self._isTimePaused) { self._time++; } }, 1000);
+	setInterval(function(){ if(!self._isTimePaused) { self._time+=100; } }, 1000);
 }
