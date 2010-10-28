@@ -1,68 +1,79 @@
 // Examples of CMI bags: objectives and interactions. This code abstracts the
 // array implementation details, and minimizes SCORM calls by caching.
 
+"use strict";
+
+var LibScormException; /* global LibScormException: false */
+
 function CMIBag(lms, bagname) {
 	this._lms      = lms;
 	this._bag      = bagname;
-	this._idCache  = new Object();
-	this._nCache   = -1;
+	this._cacheId  = {};
+	this._cacheVal = {};
+	this._cacheN   = -1;
 	this._lastSeek = 0;
-}
 
-CMIBag.prototype.GetValue = function(id, elem) {
-	var i = this.GetIndex(id);
-	if(i == -1) {
-		throw new LibScormException(-1, "CMIBag::GetElement",
-			"Identifier '" + id + "' not found in collection 'cmi." + this._bag + "'.", "");
-	}
-	return this._lms.GetValue(["cmi", this._bag, i, elem].join("."));
-}
-
-CMIBag.prototype.SetValue = function(id, elem, val) {
-	var i = this.GetIndex(id);
-	if(i == -1) {
-		i = this._addId(id);
-	}
-	this._lms.SetValue(["cmi", this._bag, i, elem].join("."), val);
-}
-
-CMIBag.prototype.GetElementList = function() {
-	var ret = new Array(this._getCount());
-	for(var i = 0; i < this._getCount(); i++) {
-		ret[i] = this._lms.GetValue(["cmi", this._bag, i, "id"].join("."));
-	}
-	return ret;
-}
-
-CMIBag.prototype.GetIndex = function(id) {
-	if(typeof this._idCache[id] != "undefined") {
-		return this._idCache[id];
-	}
-	for( ; this._lastSeek < this._getCount(); this._lastSeek++) {
-		var x = this._lms.GetValue(["cmi", this._bag, this._lastSeek, "id"].join("."));
-		this._idCache[x] = this._lastSeek;
-		if(x == id) {
-			return this._lastSeek;
+	this.GetValue = function(id, elem) {
+		var i = this.GetIndex(id);
+		if(i == -1) {
+			throw new LibScormException(-1, "this.:GetElement",
+				"Identifier '" + id + "' not found in collection 'cmi." + this._bag + "'.", "");
 		}
-	}
-	return -1;
-}
+		if(typeof this._cacheVal[id + '.' + elem] == "undefined") {
+			this._cacheVal[id + '.' + elem] = this._lms.GetValue(["cmi", this._bag, i, elem].join("."));
+		}
+		return this._cacheVal[id + '.' + elem];
+	};
 
-CMIBag.prototype._getCount = function() {
-	if(this._nCache < 0) {
-		this._nCache = this._lms.GetValue(["cmi", this._bag, "_count"].join("."));
-	}
-	return this._nCache;
-}
+	this.SetValue = function(id, elem, val) {
+		if(typeof this._cacheVal[id + '.' + elem] != "undefined" &&  this._cacheVal[id + '.' + elem] == val) {
+			return;
+		}
+		var i = this.GetIndex(id);
+		if(i == -1) {
+			i = this._addId(id);
+		}
+		try {
+			this._lms.SetValue(["cmi", this._bag, i, elem].join("."), val);
+			this._cacheVal[id + '.' + elem] = val;
+		} catch(e) {
+			throw e;
+		}
+	};
 
-CMIBag.prototype._addId = function(id) {
-	this._lms.SetValue(["cmi", this._bag, this._getCount(), "id"].join("."), id);
-	this._idCache[id] = this._getCount();
-	return this._nCache++;
-}
+	this.GetElementList = function() {
+		var ret = new Array(this._getCount());
+		for(var i = 0; i < this._getCount(); i++) {
+			ret[i] = this._lms.GetValue(["cmi", this._bag, i, "id"].join("."));
+		}
+		return ret;
+	};
 
-CMIBag.prototype._lms;
-CMIBag.prototype._bag;
-CMIBag.prototype._idCache;
-CMIBag.prototype._nCache;
-CMIBag.prototype._lastSeek;
+	this.GetIndex = function(id) {
+		if(typeof this._cacheId[id] != "undefined") {
+			return this._cacheId[id];
+		}
+		for( ; this._lastSeek < this._getCount(); this._lastSeek++) {
+			var x = this._lms.GetValue(["cmi", this._bag, this._lastSeek, "id"].join("."));
+			this._cacheId[x] = this._lastSeek;
+			if(x == id) {
+				return this._lastSeek;
+			}
+		}
+		return -1;
+	};
+
+	this._getCount = function() {
+		if(this._cacheN < 0) {
+			this._cacheN = this._lms.GetValue(["cmi", this._bag, "_count"].join("."));
+		}
+		return this._cacheN;
+	};
+
+	this._addId = function(id) {
+		this._lms.SetValue(["cmi", this._bag, this._getCount(), "id"].join("."), id);
+		this._cacheId[id] = this._getCount();
+		this._cacheN++;
+		return this._cacheN;
+	};
+}

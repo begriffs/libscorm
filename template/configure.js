@@ -12,7 +12,7 @@ var NAV_pages              = [];
 // List of files to load as pages of this SCO, e.g.
 // ['first.html', 'second.html']  These pages can be HTMLs or SWFs.
 
-var NAV_trackProgress      = true;
+var NAV_trackProgress      = false;
 // Set the progress measure of the SCO as the ratio
 // of pages viewed to total pages. Progress will update as
 // user moves through the navigation.
@@ -86,5 +86,8 @@ var NAV_flashParams = {
 // If your SCO loads flash, it will do so with these parameters.
 // If not, then you can erase them with no harm.
 
-/////////////////////////////////////////////////////////////////////
-// Distributed with LibSCORM 2.7
+// ******************************************************************
+// $Rev::               $:  Revision of last commit
+// $Author::            $:  Author of last commit
+// $Date::              $:  Date of last commit
+// ******************************************************************

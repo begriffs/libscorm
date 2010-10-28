@@ -1,3 +1,7 @@
+"use strict";
+
+var modify; /* global modify: false */
+
 function TrackCompletion(nav) {
 	var o = modify(nav);
 	o.GotoPage = function(number) {
@@ -8,10 +12,12 @@ function TrackCompletion(nav) {
 			nav._lms.Commit();
 		}
 		return ret;
-	}
+	};
 	// And we note the existing completion of Nav
-	nav._lms.SetValue("cmi.completion_status",
-	                  (nav.GetVisitedRatio() == 1) ? "completed" : "incomplete");
+	if(nav._lms) {
+		nav._lms.SetValue("cmi.completion_status",
+			(nav.GetVisitedRatio() == 1) ? "completed" : "incomplete");
+	}
 	return o;
 }
 
@@ -24,9 +30,11 @@ function TrackProgress(nav) {
 			nav._lms.Commit();
 		}
 		return ret;
-	}
+	};
 	// And we note existing progress of Nav 
-	nav._lms.SetValue("cmi.progress_measure", nav.GetVisitedRatio());
+	if(nav._lms) {
+		nav._lms.SetValue("cmi.progress_measure", nav.GetVisitedRatio());
+	}
 	return o;
 }
 
@@ -37,23 +45,23 @@ function AddHTMLInterface(nav,             navDivId,       prevEnabledImg,
 	var x;
 	var navDiv = document.getElementById(navDivId);
 	if(nav.NumPages() > 1 || nav._iss.CanExitBackward()) {
-		x    = new Image();
+		x    = document.createElement("img");
 		x.id = "prev";
 		navDiv.appendChild(x);
 	}
 	if(nav.NumPages() > 1) { // A single page needs no navigation
 		for(var i = 0; i < nav.NumPages(); i++) {
-			x         = new Image();
+			x         = document.createElement("img");
 			x.id      = "p"+i;
 			x.onclick = (function(i) { return function() { 
-				try { o.GotoPage(i) } catch(e) { nav._asyncErrHandler(e) }
-			} })(i);
+				try { o.GotoPage(i); } catch(e) { nav._asyncErrHandler(e); }
+			}; })(i);
 			x.className = "tick";
 			navDiv.appendChild(x);
 		}
 	}
 	if(nav.NumPages() > 1 || nav._iss.CanExitForward()) {
-		x    = new Image();
+		x    = document.createElement("img");
 		x.id = "next";
 		navDiv.appendChild(x);
 	}
@@ -99,7 +107,7 @@ function AddHTMLInterface(nav,             navDivId,       prevEnabledImg,
 				n.className = "disabled";
 			}
 		}
-	}
+	};
 
 	o.GotoPage = function(number) {
 		if(nav.GotoPage(number)) {
@@ -107,7 +115,7 @@ function AddHTMLInterface(nav,             navDivId,       prevEnabledImg,
 			return true;
 		}
 		return false;
-	}
+	};
 
 	o.PrevPage = function() {
 		if(nav.PrevPage()) {
@@ -115,7 +123,7 @@ function AddHTMLInterface(nav,             navDivId,       prevEnabledImg,
 			return true;
 		}
 		return false;
-	}
+	};
 
 	o.NextPage = function() {
 		if(nav.NextPage()) {
@@ -123,7 +131,7 @@ function AddHTMLInterface(nav,             navDivId,       prevEnabledImg,
 			return true;
 		}
 		return false;
-	}
+	};
 	///////////////////////////////////////////////////////////////////////
 
 	o.UpdateInterface();
