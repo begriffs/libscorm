@@ -87,7 +87,8 @@ var NAV_flashParams = {
 // If not, then you can erase them with no harm.
 
 // ******************************************************************
-// $Rev::               $:  Revision of last commit
-// $Author::            $:  Author of last commit
-// $Date::              $:  Date of last commit
+//                 VERSION INFORMATION FOR THIS RELEASE
+// $Rev::                                $:  Revision of last commit
+// $Author::                             $:  Author of last commit
+// $Date::                               $:  Date of last commit
 // ******************************************************************
