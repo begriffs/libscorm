@@ -65,6 +65,7 @@ function boilerplate_beforeTerminate() {
 		if(LMS_trackSessionTime) {
 			lms.RecordSessionTime();
 		}
+		lms.SetValue("cmi.exit", LMS_suspendOnExit ? "suspend" : "normal");
 	}
 }
 
@@ -72,7 +73,6 @@ function boilerplate_unload() {
 	try {
 		boilerplate_beforeTerminate();
 		if(lms) {
-			lms.SetValue("cmi.exit", LMS_suspendOnExit ? "suspend" : "normal");
 			lms.Terminate();
 		}
 	} catch(e) {

@@ -17,6 +17,7 @@ function TrackCompletion(nav) {
 	if(nav._lms) {
 		nav._lms.SetValue("cmi.completion_status",
 			(nav.GetVisitedRatio() == 1) ? "completed" : "incomplete");
+		nav._lms.Commit();
 	}
 	return o;
 }
@@ -34,6 +35,7 @@ function TrackProgress(nav) {
 	// And we note existing progress of Nav 
 	if(nav._lms) {
 		nav._lms.SetValue("cmi.progress_measure", nav.GetVisitedRatio());
+		nav._lms.Commit();
 	}
 	return o;
 }
@@ -111,22 +113,6 @@ function AddHTMLInterface(nav,             navDivId,       prevEnabledImg,
 
 	o.GotoPage = function(number) {
 		if(nav.GotoPage(number)) {
-			this.UpdateInterface();
-			return true;
-		}
-		return false;
-	};
-
-	o.PrevPage = function() {
-		if(nav.PrevPage()) {
-			this.UpdateInterface();
-			return true;
-		}
-		return false;
-	};
-
-	o.NextPage = function() {
-		if(nav.NextPage()) {
 			this.UpdateInterface();
 			return true;
 		}

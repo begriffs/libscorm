@@ -10,11 +10,8 @@ var LibScormException; /*global LibScormException: false */
 
 function LMS(win) {
 	this.Terminate = function() {
-		if(this._terminated) {
-			return;
-		}
-		this._terminated = true;
 		this._wrap("Terminate", true, "");
+		this._terminated = true;
 	};
 
 	this.IsTerminated = function() {
@@ -75,6 +72,9 @@ function LMS(win) {
 
 	// _wrap passes along any extra arguments
 	this._wrap = function(func, isBoolean) {
+		if(this.IsTerminated()) {
+			return false;
+		}
 		var args = [];
 		for(var i = 2; i < arguments.length; i++) {
 			// These arguments will appear in an eval, so we MUST
