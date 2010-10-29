@@ -73,7 +73,6 @@ function CMIBag(lms, bagname) {
 	this._addId = function(id) {
 		this._lms.SetValue(["cmi", this._bag, this._getCount(), "id"].join("."), id);
 		this._cacheId[id] = this._getCount();
-		this._cacheN++;
-		return this._cacheN;
+		return this._cacheN++;
 	};
 }
