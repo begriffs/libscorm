@@ -30,6 +30,36 @@ function LMS(win) {
 		this._wrap("Commit", true, "");
 	};
 
+	this.CentisecsToDuration = function(n) {
+		n = Math.max(n,0); // there is no such thing as a negative duration
+		var nCs = n, nY=0, nM=0, nD=0, nH=0, nMin=0, str = 'P';
+		// Next set of operations uses whole seconds
+		nCs = Math.round(nCs);
+		nY = Math.floor(nCs / 3155760000);
+		nCs -= nY * 3155760000;
+		nM = Math.floor(nCs / 262980000);
+		nCs -= nM * 262980000;
+		nD = Math.floor(nCs / 8640000);
+		nCs -= nD * 8640000;
+		nH = Math.floor(nCs / 360000);
+		nCs -= nH * 360000;
+		nMin = Math.floor(nCs / 6000);
+		nCs -= nMin * 6000;
+		// Now we can construct string
+		if (nY > 0) { str += nY + "Y"; }
+		if (nM > 0) { str += nM + "M"; }
+		if (nD > 0) { str += nD + "D"; }
+		if ((nH > 0) || (nMin > 0) || (nCs > 0)) {
+			str += "T";
+			if (nH > 0)   { str += nH + "H"; }
+			if (nMin > 0) { str += nMin + "M"; }
+			if (nCs > 0)  { str += (nCs / 100) + "S"; }
+		}
+		if (str == "P") { str = "PT0H0M0S"; }
+		// technically PT0S should do but SCORM test suite assumes longer form
+		return str;
+	};
+
 	this.StartSessionTimer = function() {
 		this._isTimePaused = false;
 	};
@@ -39,7 +69,7 @@ function LMS(win) {
 	};
 
 	this.RecordSessionTime = function() {
-		this.SetValue("cmi.session_time", this._centisecsToDuration(this._time));
+		this.SetValue("cmi.session_time", this.CentisecsToDuration(this._time));
 	};
 
 	//////////////////////////////////////////////////////////////////////////////
@@ -62,13 +92,8 @@ function LMS(win) {
 	};
 
 	//////////////////////////////////////////////////////////////////////////////
-	//////////////////////////////// PRIVATE STUFF ///////////////////////////////
+	//                               PRIVATE STUFF
 	//////////////////////////////////////////////////////////////////////////////
-
-	this._api          = null;
-	this._time         = 0;
-	this._isTimePaused = true;
-	this._terminated   = false;
 
 	// _wrap passes along any extra arguments
 	this._wrap = function(func, isBoolean) {
@@ -87,7 +112,7 @@ function LMS(win) {
 		// Certainly we wouldn't have to mess with quoting the arguments, etc.
 		// The answer is that LiveConnect does not offer us a real object
 		// with function members, e.g. typeof this._api["Initialize"] == undefined
-		var result = eval("this._api." + func + "(" + args.join(",") + ");");
+		var result = eval('this._api.' + func + '(' + args.join(',') + ');');
 
 		// boolean functions afford us an optimization: if the function returns
 		// true then we needn't GetLastError (another costly call to the LMS)
@@ -96,7 +121,7 @@ function LMS(win) {
 			if(err != 0) {
 				throw new LibScormException(
 					err,
-					"LMS::" + func + "(" + args.join(",") + ")",
+					'LMS::' + func + '(' + args.join(',') + ')',
 					this._api.GetErrorString(err),
 					this._api.GetDiagnostic(err));
 			}
@@ -135,45 +160,13 @@ function LMS(win) {
 		return api;
 	};
 
-	this._centisecsToDuration = function(n) {
-		// Courtesy of the late Claude Ostyn
-		var str = "P";
-		var nCs=n;
-		var nY=0, nM=0, nD=0, nH=0, nMin=0, nS=0;
-		n = Math.max(n,0); // there is no such thing as a negative duration
-		var nCs = n;
-		// Next set of operations uses whole seconds
-		with (Math) {
-			nCs = round(nCs);
-			nY = floor(nCs / 3155760000);
-			nCs -= nY * 3155760000;
-			nM = floor(nCs / 262980000);
-			nCs -= nM * 262980000;
-			nD = floor(nCs / 8640000);
-			nCs -= nD * 8640000;
-			nH = floor(nCs / 360000);
-			nCs -= nH * 360000;
-			var nMin = floor(nCs / 6000);
-			nCs -= nMin * 6000
-		}
-		// Now we can construct string
-		if (nY > 0) str += nY + "Y";
-		if (nM > 0) str += nM + "M";
-		if (nD > 0) str += nD + "D";
-		if ((nH > 0) || (nMin > 0) || (nCs > 0)) {
-			str += "T";
-			if (nH > 0) str += nH + "H";
-			if (nMin > 0) str += nMin + "M";
-			if (nCs > 0) str += (nCs / 100) + "S";
-		}
-		if (str == "P") str = "PT0H0M0S";
-		// technically PT0S should do but SCORM test suite assumes longer form.
-		return str;
-	}
 
 	///// INITIALIZE /////////////////////////////////////////////////////////////
 
-	this._api  = this._getAPI(win);
+	this._time         = 0;
+	this._isTimePaused = true;
+	this._terminated   = false;
+	this._api          = this._getAPI(win);
 	if(this._api === null) {
 		throw new LibScormException(
 			-1, "LMS::LMS",
