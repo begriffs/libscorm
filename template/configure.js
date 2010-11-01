@@ -86,9 +86,4 @@ var NAV_flashParams = {
 // If your SCO loads flash, it will do so with these parameters.
 // If not, then you can erase them with no harm.
 
-// ******************************************************************
-//                 VERSION INFORMATION FOR THIS RELEASE
-// $Rev$
-// $Author$
-// $Date$
-// ******************************************************************
+// Distributed with LibSCORM version 2.7
