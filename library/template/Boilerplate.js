@@ -107,16 +107,16 @@ function boilerplate_load() {
 		}
 		nav = new Nav(NAV_pages, 'content', lms, iss, boilerplate_handleException,
 			window.NAV_flashParams === undefined ? {} : NAV_flashParams);
-		if(NAV_trackProgress) {
-			nav = TrackProgress(nav);
-		}
-		if(NAV_trackCompletion) {
-			nav = TrackCompletion(nav);
-		}
 		if(NAV_show) {
 			nav = AddHTMLInterface(nav, "nav", NAV_prevEnabledImg,
 				NAV_prevDisabledImg, NAV_nextEnabledImg, NAV_nextDisabledImg,
 				NAV_pastTickImg, NAV_presentTickImg, NAV_futureTickImg);
+		}
+		if(NAV_trackCompletion) {
+			nav = TrackCompletion(nav);
+		}
+		if(NAV_trackProgress) {
+			nav = TrackProgress(nav);
 		}
 	} catch(f) {
 		boilerplate_handleException(f);
