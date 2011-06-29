@@ -25,6 +25,7 @@ var DC_showConsoleIcon;       /*global DC_showConsoleIcon: false */
 var DC_errorImg;              /*global DC_errorImg: false */
 var LMS_suspendOnExit;        /*global LMS_suspendOnExit: false */
 var LMS_trackSessionTime;     /*global LMS_trackSessionTime: false */
+var LMS_adlDataIds;           /*global LMS_adlDataIds: shared variables name=>id associative array */
 var ISS_noExitBeforeComplete; /*global ISS_noExitBeforeComplete: false */
 var NAV_pages;                /*global NAV_pages: false */
 var NAV_flashParams;          /*global NAV_flashParams: false */
@@ -90,6 +91,7 @@ function boilerplate_load() {
 		if(LMS_trackSessionTime) {
 			lms.StartSessionTimer();
 		}
+		lms.LoadSharedValues();
 		objectives   = new CMIBag(lms, "objectives");
 		interactions = new CMIBag(lms, "interactions");
 	} catch(e) {
