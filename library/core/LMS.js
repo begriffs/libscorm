@@ -26,24 +26,6 @@ function LMS(win) {
 		this._wrap("SetValue", true, name, value);
 	};
 
-	this.LoadSharedValues = function() {
-		LMS adlDataIds = new Array();
-		var data count = lms.GetValue('adl.data. count');
-		for ( var i = 0; i < data count; i++ ) {
-			LMS adlDataIds[lms.GetValue('adl.data.' + i + '.id')] = i;
-		}
-	};
-
-	this.GetSharedValue = function(name) {
-		name = 'adl.data.' + LMS adlDataIds[name] + '.store';
-		return this. wrap("GetValue", false, name);
-	};
-
-	this.SetSharedValue = function(name, value) {
-		name = 'adl.data.' + LMS adlDataIds[name] + '.store';
-		this. wrap("SetValue", true, name, value);
-	};
-
 	this.Commit = function() {
 		this._wrap("Commit", true, "");
 	};
